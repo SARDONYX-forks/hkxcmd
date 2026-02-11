@@ -43,7 +43,7 @@ static void HelpString(hkxcmd::HelpType type){
 	switch (type)
 	{
 	case hkxcmd::htShort: Log::Info("DumpList - Dump the transform or float list for a given skeleton"); break;
-	case hkxcmd::htLong:  
+	case hkxcmd::htLong:
 		{
 			char fullName[MAX_PATH], exeName[MAX_PATH];
 			GetModuleFileName(NULL, fullName, MAX_PATH);
@@ -305,13 +305,13 @@ static bool ExecuteCmd(hkxcmdLine &cmdLine)
 									hkRefPtr<hkaSkeleton> skeleton = skelAnimCont->m_skeletons[0];
 									int nbones = skeleton->m_bones.getSize();
 									Log::Info("Exporting skeleton '%s' with %d bones to '%s'"
-										, skeleton->m_name, skeleton->m_bones.getSize(), PathFindFileName(path));
+										, skeleton->m_name.cString(), skeleton->m_bones.getSize(), PathFindFileName(path));
 
 									{
 										hkOstream stream(path);
 										for (int i=0; i<nbones; ++i)
 										{
-											string name = skeleton->m_bones[i].m_name;
+											string name = skeleton->m_bones[i].m_name.cString();
 											stream.printf("%s\r\n", name.c_str());
 										}
 									}
@@ -321,12 +321,12 @@ static bool ExecuteCmd(hkxcmdLine &cmdLine)
 										_makepath(path, drive, dir, fname, ext);
 
 										Log::Info("Exporting skeleton '%s' with %d floats to '%s'"
-											, skeleton->m_name, skeleton->m_floatSlots.getSize(), PathFindFileName(path));
+											, skeleton->m_name.cString(), skeleton->m_floatSlots.getSize(), PathFindFileName(path));
 
 										hkOstream stream(path);
 										for (int i=0, n=skeleton->m_floatSlots.getSize(); i<n; ++i)
 										{
-											string name = skeleton->m_floatSlots[i];
+											string name = skeleton->m_floatSlots[i].cString();
 											stream.printf("%s\r\n", name.c_str());
 										}
 									}
@@ -361,4 +361,3 @@ static bool SafeExecuteCmd(hkxcmdLine &cmdLine)
 }
 
 REGISTER_COMMAND(DumpList, HelpString, SafeExecuteCmd);
-

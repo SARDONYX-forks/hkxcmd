@@ -163,13 +163,13 @@ static void HelpString(hkxcmd::HelpType type){
 	switch (type)
 	{
 	case hkxcmd::htShort: Log::Info("ConvertKF - Convert Gamebryo KF animation to Havok HKX animation."); break;
-	case hkxcmd::htLong:  
+	case hkxcmd::htLong:
 		{
 			char fullName[MAX_PATH], exeName[MAX_PATH];
 			GetModuleFileName(NULL, fullName, MAX_PATH);
 			_splitpath(fullName, NULL, NULL, exeName, NULL);
 
-			Log::Info("Usage: %s ConvertKF [-opts[modifiers]] [skel.hkx] [anim.kf] [anim.hkx]", exeName); 
+			Log::Info("Usage: %s ConvertKF [-opts[modifiers]] [skel.hkx] [anim.kf] [anim.hkx]", exeName);
 			Log::Info("  Convert Gamebryo KF animation to Havok HKX animation" );
 			Log::Info("  If a folder is specified then the folder will be searched for any projects and convert those." );
 			Log::Info("");
@@ -239,7 +239,7 @@ vector< QuatKey > SampleQuatRotateKeys(NiInterpolatorRef interp, int npoints, fl
 * \param degree N-th order degree of polynomial used to fit the data.
 * \return A vector containing Key<Vector3> data which specify translation over time.
 */
-vector< Vector3Key > SampleTranslateKeys(NiInterpolatorRef interp, int npoints, float startTime, float endTime, int degree=3)
+vector< Vector3Key > SampleTranslateKeys(const NiInterpolatorRef& interp, int npoints, float startTime, float endTime, int degree=3)
 {
 	vector< Vector3Key > vk;
 	return vk;
@@ -251,7 +251,7 @@ vector< Vector3Key > SampleTranslateKeys(NiInterpolatorRef interp, int npoints, 
 * \param degree N-th order degree of polynomial used to fit the data.
 * \return A vector containing Key<float> data which specify scale over time.
 */
-vector< FloatKey > SampleScaleKeys(NiInterpolatorRef interp, int npoints, float startTime, float endTime, int degree=3)
+vector< FloatKey > SampleScaleKeys(const NiInterpolatorRef& interp, int npoints, float startTime, float endTime, int degree=3)
 {
 	vector< FloatKey > sk;
 	return sk;
@@ -259,7 +259,7 @@ vector< FloatKey > SampleScaleKeys(NiInterpolatorRef interp, int npoints, float 
 
 struct AnimationExport
 {
-	AnimationExport(NiControllerSequenceRef seq, hkRefPtr<hkaSkeleton> skeleton, hkRefPtr<hkaAnimationBinding> binding);
+	AnimationExport(const NiControllerSequenceRef& seq, const hkRefPtr<hkaSkeleton>& skeleton, const hkRefPtr<hkaAnimationBinding>& binding);
 
 	bool doExport();
 	bool exportNotes( );
@@ -279,7 +279,7 @@ bool AnimationExport::s_additiveBlend = false;
 bool AnimationExport::s_convertFloatTracks = false;
 }
 
-AnimationExport::AnimationExport(NiControllerSequenceRef seq, hkRefPtr<hkaSkeleton> skeleton, hkRefPtr<hkaAnimationBinding> binding)
+AnimationExport::AnimationExport(const NiControllerSequenceRef& seq, const hkRefPtr<hkaSkeleton>& skeleton, const hkRefPtr<hkaAnimationBinding>& binding)
 {
 	this->seq = seq;
 	this->binding = binding;
@@ -399,7 +399,7 @@ namespace {
 
 static void FillTransforms( hkArray<hkQsTransform>& transforms, int boneIdx, int numTracks
 					, const hkQsTransform& localTransform, PosRotScale prs = prsDefault
-					, int from=0, int to=-1) 
+					, int from=0, int to=-1)
 {
 	int n = transforms.getSize() / numTracks;
 	if (n == 0)
@@ -640,14 +640,14 @@ bool AnimationExport::exportController()
 	StringIntMap boneMap;
 	int nbones = skeleton->m_bones.getSize();
 	for (int i = 0; i < nbones; i++) {
-		std::string name = skeleton->m_bones[i].m_name;
+		std::string name = skeleton->m_bones[i].m_name.cString();
 		boneMap[name] = i;
 	}
 
 	//Map float tracks
 	StringIntMap floatMap;
 	for (int i = 0; i < skeleton->m_floatSlots.getSize(); i++) {
-		std::string name = skeleton->m_floatSlots[i];
+		std::string name = skeleton->m_floatSlots[i].cString();
 		floatMap[name] = i;
 	}
 
@@ -712,7 +712,7 @@ bool AnimationExport::exportController()
 
 	hkArray<hkQsTransform>& transforms = tempAnim->m_transforms;
 	hkArray<hkReal>& floats = tempAnim->m_floats;
-	
+
 	if (binding->m_blendHint == hkaAnimationBinding::NORMAL) {
 		//prefill with bind pose, in case some tracks are missing
 		//(might actually be a lot of wasted work if most tracks are keyframed)
@@ -753,7 +753,7 @@ bool AnimationExport::exportController()
 	if (binding->m_blendHint == hkaAnimationBinding::ADDITIVE)
 		binding->m_transformTrackToBoneIndices.swap(trackToBone);
 
-	hkaSkeletonUtils::normalizeRotations (transforms.begin(), transforms.getSize()); 
+	hkaSkeletonUtils::normalizeRotations (transforms.begin(), transforms.getSize());
 
 	//Do the same with float tracks
 	if (s_convertFloatTracks) {
@@ -778,7 +778,7 @@ bool AnimationExport::exportController()
 		tparams.m_rotationTolerance = 0.001f;
 		tparams.m_rotationQuantizationType = hkaSplineCompressedAnimation::TrackCompressionParams::THREECOMP40;
 
-		hkRefPtr<hkaSplineCompressedAnimation> outAnim = new hkaSplineCompressedAnimation( *tempAnim.val(), tparams, aparams ); 
+		hkRefPtr<hkaSplineCompressedAnimation> outAnim = new hkaSplineCompressedAnimation( *tempAnim.val(), tparams, aparams );
 		binding->m_animation = outAnim;
 	}
 
@@ -803,7 +803,7 @@ static void ExportAnimations(const string& rootdir, const string& skelfile
       skelResource = hkSerializeLoadResource(reader);
       if (skelResource == NULL)
       {
-         Log::Warn("Skeleton File is not loadable: '%s'", skelfile);
+         Log::Warn("Skeleton File is not loadable: '%s'", skelfile.c_str());
       }
       else
 		{
@@ -841,7 +841,7 @@ static void ExportAnimations(const string& rootdir, const string& skelfile
 					PathRelativePathTo(relpath, rootdir.c_str(), FILE_ATTRIBUTE_DIRECTORY, animfile.c_str(), 0);
 					PathCombine(outfile, outdir.c_str(), relpath);
 					GetFullPathName(outfile, MAX_PATH, outfile, NULL);
-				}				
+				}
 				PathRemoveExtension(outfile);
 				PathAddExtension(outfile, ".hkx");
 			}
@@ -850,7 +850,7 @@ static void ExportAnimations(const string& rootdir, const string& skelfile
 			PathRelativePathTo(relout, workdir, FILE_ATTRIBUTE_DIRECTORY, outfile, 0);
 
 			Log::Verbose("ExportAnimation Reading '%s'", animfile.c_str());
-			
+
 			//Can we disable exceptions in current Niflib? Just catch all and move on.
 			vector<NiControllerSequenceRef> blocks;
 			try {
@@ -933,7 +933,7 @@ static void ExportProject( const string &projfile, const char * rootPath, const 
 		PathRemoveFileSpec(projpath);
 		PathAddBackslash(projpath);
 		PathCombine(animpath, projpath, "..\\animations\\*.hkx");
-		FindFiles(animfiles, animpath, recursion);	
+		FindFiles(animfiles, animpath, recursion);
 	}
 	else
 	{
@@ -1004,7 +1004,7 @@ static bool ExecuteCmd(hkxcmdLine &cmdLine)
 					if ( param[0] == 0 )
 						break;
 					flags = (hkSerializeUtil::SaveOptionBits)StringToFlags(param, SaveFlags, hkSerializeUtil::SAVE_DEFAULT);
-				} 
+				}
 				break;
 			case 'l':
 				AnimationExport::s_convertFloatTracks = true;
@@ -1131,7 +1131,7 @@ static bool ExecuteCmd(hkxcmdLine &cmdLine)
 			{
 				Log::Verbose("Ignoring '%s' due to inexact skeleton.hkx file match", (*itr).c_str());
 				itr = files.erase(itr);
-			}			
+			}
 		}
 
 
@@ -1183,8 +1183,8 @@ static bool ExecuteCmd(hkxcmdLine &cmdLine)
 				char outdir[MAX_PATH];
 				if (paths.size() >= 1){
 					GetFullPathName(paths[1].c_str(), MAX_PATH, outdir, NULL);
-				} else { 
-					strcpy(outdir, rootPath); 
+				} else {
+					strcpy(outdir, rootPath);
 				}
 				ExportProject(skelpath, rootPath, outdir, pkFormat, packFileOptions, flags, recursion);
 			}
@@ -1253,8 +1253,8 @@ static bool ExecuteCmd(hkxcmdLine &cmdLine)
 							char outdir[MAX_PATH];
 							if (paths.size() >= 2){
 								GetFullPathName(paths[2].c_str(), MAX_PATH, outdir, NULL);
-							} else { 
-								strcpy(outdir, rootPath); 
+							} else {
+								strcpy(outdir, rootPath);
 							}
 
 							ExportAnimations(string(rootPath), skelpath, animfiles, outdir, pkFormat, packFileOptions, flags, norelativepath);

@@ -1,0 +1,51 @@
+name: Build
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    types: [opened, reopened, synchronize]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v6.0.1
+        with:
+          submodules: "recursive"
+
+      - name: Fetch Nemesis
+        shell: bash
+        run: |
+          set -eux
+          git clone https://github.com/ShikyoKira/Project-New-Reign---Nemesis-Main.git -b v0.84-beta --depth 1 nemesis_tmp
+          mkdir -p "../Havok SDK"
+          mv nemesis_tmp/external/hkxcmd/havok_2010_2_0 "../Havok SDK/2010_2_0"
+          rm -rf nemesis_tmp
+
+      - uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: "3.0.6"
+
+      - name: Cache (build dir)
+        uses: actions/cache@v5.0.1
+        with:
+          path: ${{ github.workspace }}/build
+          key: ${{ runner.os }}-xmake-build-cache
+          restore-keys: ${{ runner.os }}-xmake-build-cache-
+
+      - name: Build
+        run: xmake build -y
+      - name: Install
+        run: xmake install -o ./build/artifact hkxcmd
+
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: hkxcmd
+          path: |
+            ./build/artifact/bin/

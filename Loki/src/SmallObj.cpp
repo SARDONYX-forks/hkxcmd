@@ -2,14 +2,14 @@
 // The Loki Library
 // Copyright (c) 2001 by Andrei Alexandrescu
 // This code accompanies the book:
-// Alexandrescu, Andrei. "Modern C++ Design: Generic Programming and Design 
+// Alexandrescu, Andrei. "Modern C++ Design: Generic Programming and Design
 //     Patterns Applied". Copyright (c) 2001. Addison-Wesley.
-// Permission to use, copy, modify, distribute and sell this software for any 
-//     purpose is hereby granted without fee, provided that the above  copyright 
-//     notice appear in all copies and that both that copyright notice and this 
+// Permission to use, copy, modify, distribute and sell this software for any
+//     purpose is hereby granted without fee, provided that the above  copyright
+//     notice appear in all copies and that both that copyright notice and this
 //     permission notice appear in supporting documentation.
-// The author or Addison-Wesley Longman make no representations about the 
-//     suitability of this software for any purpose. It is provided "as is" 
+// The author or Addison-Wesley Longman make no representations about the
+//     suitability of this software for any purpose. It is provided "as is"
 //     without express or implied warranty.
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -357,7 +357,7 @@ void* Chunk::Allocate(std::size_t blockSize)
 {
     if ( IsFilled() ) return NULL;
 
-    assert((firstAvailableBlock_ * blockSize) / blockSize == 
+    assert((firstAvailableBlock_ * blockSize) / blockSize ==
         firstAvailableBlock_);
     unsigned char * pResult = pData_ + (firstAvailableBlock_ * blockSize);
     firstAvailableBlock_ = *pResult;
@@ -501,7 +501,7 @@ bool Chunk::IsBlockAvailable( void * p, unsigned char numBlocks,
     std::size_t blockSize ) const
 {
     (void) numBlocks;
-    
+
     if ( IsFilled() )
         return false;
 
@@ -858,8 +858,8 @@ void * FixedAllocator::Allocate( void )
         }
     }
     else if ( allocChunk_ == emptyChunk_)
-        // detach emptyChunk_ from allocChunk_, because after 
-        // calling allocChunk_->Allocate(blockSize_); the chunk 
+        // detach emptyChunk_ from allocChunk_, because after
+        // calling allocChunk_->Allocate(blockSize_); the chunk
         // is no longer empty.
         emptyChunk_ = NULL;
 
@@ -988,7 +988,7 @@ void FixedAllocator::DoDeallocate(void* p)
             assert( lastChunk->HasAvailable( numBlocks_ ) );
             lastChunk->Release();
             chunks_.pop_back();
-            if ( ( allocChunk_ == lastChunk ) || allocChunk_->IsFilled() ) 
+            if ( ( allocChunk_ == lastChunk ) || allocChunk_->IsFilled() )
                 allocChunk_ = deallocChunk_;
         }
         emptyChunk_ = deallocChunk_;
@@ -1031,7 +1031,7 @@ void * DefaultAllocator( std::size_t numBytes, bool doThrow )
 
 // DefaultDeallocator ---------------------------------------------------------
 /** @ingroup SmallObjectGroupInternal
- Calls default deallocator when SmallObjAllocator decides not to handle a   
+ Calls default deallocator when SmallObjAllocator decides not to handle a
  request.  The default deallocator could be the global delete operator or the
  free function.  The free function is the preferred default deallocator since
  it matches malloc which is the preferred default allocator.  SmallObjAllocator
@@ -1120,7 +1120,8 @@ void * SmallObjAllocator::Allocate( std::size_t numBytes, bool doThrow )
     if ( ( NULL == place ) && doThrow )
     {
 #ifdef _MSC_VER
-        throw std::bad_alloc( "could not allocate small object" );
+        // throw std::bad_alloc( "could not allocate small object" );
+        throw std::bad_alloc();
 #else
         // GCC did not like a literal string passed to std::bad_alloc.
         // so just throw the default-constructed exception.
@@ -1217,7 +1218,7 @@ bool SmallObjAllocator::IsCorrupt( void ) const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Change log:
-// March 20: fix exception safety issue in FixedAllocator::Allocate 
+// March 20: fix exception safety issue in FixedAllocator::Allocate
 //     (thanks to Chris Udazvinis for pointing that out)
 // June 20, 2001: ported by Nick Thurn to gcc 2.95.3. Kudos, Nick!!!
 // Aug 02, 2002: Fix in VicinityFind sent by Pavel Vozenilek

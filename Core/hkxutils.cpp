@@ -72,7 +72,7 @@ int wildcmpi(const TCHAR *wild, const TCHAR *string) {
    return !*wild;
 }
 
-bool wildmatch(const string& match, const std::string& value) 
+bool wildmatch(const string& match, const std::string& value)
 {
    return (wildcmpi(match.c_str(), value.c_str())) ? true : false;
 }
@@ -122,7 +122,7 @@ std::string FormatString(const TCHAR* format,...)
 string replaceSubstring(string instr, string match, string repl) {
 
    string retval = instr;
-   for (int pos = retval.find(match, 0); pos != string::npos; pos = retval.find(match, 0)) 
+   for (int pos = retval.find(match, 0); pos != string::npos; pos = retval.find(match, 0))
    {
       retval.erase(pos, match.length());
       retval.insert(pos, repl);
@@ -279,7 +279,7 @@ void FindFiles(vector<string>& collection, const TCHAR *path, stringlist& exclud
 						continue;
 				}
 
-				collection.push_back( string(buffer) );					
+				collection.push_back( string(buffer) );
 			}
 		}
 		FindClose(hFind);
@@ -335,6 +335,7 @@ void CreateDirectories(LPCTSTR path)
  */
 #include <math.h>
 
+#if !defined(_MSC_VER) || _MSC_VER < 1900
 float roundf (float x)
 {
   float res;
@@ -342,6 +343,7 @@ float roundf (float x)
   else { res = ceilf (-x); if (res + x > 0.5F) res -= 1.0F; res = -res; }
   return res;
 }
+#endif
 
 
 
@@ -395,19 +397,19 @@ string GetFileVersion(const char *fileName)
       {
          DWORD vLen = 0;
          DWORD vSize = GetFileVersionInfoSize(fileName,&vLen);
-         if (vSize) 
+         if (vSize)
          {
             LPVOID versionInfo = malloc(vSize+1);
             if (GetFileVersionInfo(fileName,vLen,vSize,versionInfo))
-            {            
+            {
                LPVOID version=NULL;
-               if (VerQueryValue(versionInfo,"\\VarFileInfo\\Translation",&version,(UINT *)&vLen) && vLen==4) 
+               if (VerQueryValue(versionInfo,"\\VarFileInfo\\Translation",&version,(UINT *)&vLen) && vLen==4)
                {
                   DWORD langD = *(DWORD*)version;
                   sprintf(fileVersion, "\\StringFileInfo\\%02X%02X%02X%02X\\ProductVersion",
-                     (langD & 0xff00)>>8,langD & 0xff,(langD & 0xff000000)>>24, (langD & 0xff0000)>>16);            
+                     (langD & 0xff00)>>8,langD & 0xff,(langD & 0xff000000)>>24, (langD & 0xff0000)>>16);
                }
-               else 
+               else
                {
                   sprintf(fileVersion, "\\StringFileInfo\\%04X04B0\\ProductVersion", GetUserDefaultLangID());
                }

@@ -316,7 +316,7 @@ bool AnimationExport::exportController()
 
 	vector<bool> scaleWarn;
 	scaleWarn.resize(numTracks);
-	
+
 	hkReal time = startTime;
 	for (int iFrame=0; iFrame<nframes; ++iFrame, time += incrFrame)
 	{
@@ -346,7 +346,7 @@ bool AnimationExport::exportController()
 			sKeys[i][iFrame].time = time;
 			sKeys[i][iFrame].data = sc.x;
 		}
-		
+
 		if (s_exportFloatTracks) {
 			for (int i = 0; i < nfloats; i++) {
 				floatKeys[i][iFrame].time = time;
@@ -373,7 +373,7 @@ bool AnimationExport::exportController()
 	//Add transform tracks
 	for (int i = 0; i < numTracks; i++) {
 		Niflib::NiTransformInterpolatorRef iplr = new Niflib::NiTransformInterpolator;
-		
+
 		//Our reference pose
 		Niflib::Vector3 refT;
 		Niflib::Quaternion refR;
@@ -480,7 +480,7 @@ void ExportAnimations(const string& rootdir, const string& skelfile, const vecto
 	{
 		for (vector<string>::const_iterator itr = animlist.begin(); itr != animlist.end(); ++itr)
 		{
-			string animfile = (*itr);
+			const string& animfile = (*itr);
 			Log::Verbose("ExportAnimation Starting '%s'", animfile.c_str());
 
 
@@ -502,7 +502,7 @@ void ExportAnimations(const string& rootdir, const string& skelfile, const vecto
 					PathRelativePathTo(relpath, rootdir.c_str(), FILE_ATTRIBUTE_DIRECTORY, animfile.c_str(), 0);
 					PathCombine(outfile, outdir.c_str(), relpath);
 					GetFullPathName(outfile, MAX_PATH, outfile, NULL);
-				}				
+				}
 				PathRemoveExtension(outfile);
 				PathAddExtension(outfile, ".kf");
 			}
@@ -579,13 +579,13 @@ static void HelpString(hkxcmd::HelpType type){
 	switch (type)
 	{
 	case hkxcmd::htShort: Log::Info("ExportKF - Convert Havok HKX animation to Gamebryo KF animation."); break;
-	case hkxcmd::htLong:  
+	case hkxcmd::htLong:
 		{
 			char fullName[MAX_PATH], exeName[MAX_PATH];
 			GetModuleFileName(NULL, fullName, MAX_PATH);
 			_splitpath(fullName, NULL, NULL, exeName, NULL);
-			
-			Log::Info("Usage: %s ExportKF [-opts[modifiers]] [skel.hkx] [anim.hkx] [anim.kf]", exeName); 
+
+			Log::Info("Usage: %s ExportKF [-opts[modifiers]] [skel.hkx] [anim.hkx] [anim.kf]", exeName);
 			Log::Info("  Convert Havok HKX animation to Gamebryo KF animation." );
 			Log::Info("  If a folder is specified then the folder will be searched for any projects and convert those." );
 			Log::Info("");
@@ -619,7 +619,7 @@ static void ExportProject( const string &projfile, const char * rootPath, const 
 		PathRemoveFileSpec(projpath);
 		PathAddBackslash(projpath);
 		PathCombine(animpath, projpath, "..\\animations\\*.hkx");
-		FindFiles(animfiles, animpath, recursion);	
+		FindFiles(animfiles, animpath, recursion);
 	}
 	else
 	{
@@ -819,7 +819,7 @@ static bool ExecuteCmd(hkxcmdLine &cmdLine)
 			{
 				Log::Verbose("Ignoring '%s' due to inexact skeleton.hkx file match", (*itr).c_str());
 				itr = files.erase(itr);
-			}			
+			}
 		}
 
 
@@ -871,8 +871,8 @@ static bool ExecuteCmd(hkxcmdLine &cmdLine)
 				char outdir[MAX_PATH];
 				if (paths.size() >= 1){
 					GetFullPathName(paths[1].c_str(), MAX_PATH, outdir, NULL);
-				} else { 
-					strcpy(outdir, rootPath); 
+				} else {
+					strcpy(outdir, rootPath);
 				}
 				ExportProject(skelpath, rootPath, outdir, nifver, recursion);
 			}
@@ -941,8 +941,8 @@ static bool ExecuteCmd(hkxcmdLine &cmdLine)
 							char outdir[MAX_PATH];
 							if (paths.size() >= 2){
 								GetFullPathName(paths[2].c_str(), MAX_PATH, outdir, NULL);
-							} else { 
-								strcpy(outdir, rootPath); 
+							} else {
+								strcpy(outdir, rootPath);
 							}
 
 							ExportAnimations(string(rootPath), skelpath, animfiles, outdir, nifver, norelativepath);

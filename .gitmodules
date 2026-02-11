@@ -1,0 +1,4 @@
+[submodule "niflib/src"]
+	path = niflib/src
+	url = https://github.com/SARDONYX-forks/niflib.git
+	branch = feature/add-ci

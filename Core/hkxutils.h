@@ -26,8 +26,8 @@ static inline float TODEG(float x) { return x * 180.0f / (float)M_PI; }
 static inline float TORAD(float x) { return x * (float)M_PI / 180.0f; }
 
 // Trim whitespace before and after a string
-inline TCHAR *Trim(TCHAR*&p) { 
-   while(_istspace(*p)) *p++ = 0; 
+inline TCHAR *Trim(TCHAR*&p) {
+   while(_istspace(*p)) *p++ = 0;
    TCHAR *e = p + _tcslen(p) - 1;
    while (e > p && _istspace(*e)) *e-- = 0;
    return p;
@@ -75,7 +75,7 @@ struct NumericStringEquivalence
          if ( c1 == 0 || c2 == 0 )
             break;
          else if (isdigit(c1) && isdigit(c2))
-         {			
+         {
             lcmp = strtol(str1, &p1, 10) - strtol(str2, &p2, 10);
             if ( lcmp == 0 )
                lcmp = (p2 - str2) - (p1 - str1);
@@ -146,7 +146,9 @@ void FindFiles(std::vector<string>& collection, const TCHAR *path, bool recursiv
 
 void CreateDirectories(LPCTSTR path);
 
+#if !defined(_MSC_VER) || _MSC_VER < 1900
 extern float roundf (float x);
+#endif
 
 
 
